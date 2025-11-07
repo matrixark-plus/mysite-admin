@@ -1,5 +1,5 @@
 module.exports = {
-  'GET /api/currentUser': {
+  'GET /api/auth/me': {
     data: {
       name: 'Serati Ma',
       avatar:

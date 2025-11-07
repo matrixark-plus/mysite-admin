@@ -24,7 +24,7 @@ import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import { Footer } from '@/components';
-import { login, getFakeCaptcha } from '@/services/user';
+import { getFakeCaptcha, login } from '@/services/user';
 import Settings from '../../../../config/defaultSettings';
 
 const useStyles = createStyles(({ token }) => {
@@ -133,7 +133,8 @@ const Login: React.FC = () => {
     try {
       // 登录
       const response = await login({ ...values, type });
-      if (response.success) {
+      // 检查response.code === 200而不是success
+      if (response && response.code === 200) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',

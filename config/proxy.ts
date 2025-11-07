@@ -12,10 +12,10 @@
 export default {
   // 开发环境代理配置
   dev: {
-    // localhost:8000/api/** -> http://localhost:8001/api/**
+    // localhost:8000/api/** -> http://localhost:9501/api/**
     '/api/': {
       // 指向本地后端服务地址
-      target: 'http://localhost:8001',
+      target: 'http://localhost:9501',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,

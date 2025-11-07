@@ -1,7 +1,7 @@
 import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { notification } from 'antd';
 import { useRequest } from '@umijs/max';
+import { message } from 'antd';
 
 // 错误处理方案： 错误类型
 enum ErrorShowType {
@@ -52,53 +52,32 @@ export const errorConfig: RequestConfig = {
               // do nothing
               break;
             case ErrorShowType.WARN_MESSAGE:
-              // 使用通知代替静态message
-              notification.warning({
-                description: errorMessage,
-                message: '警告',
-              });
+              // 使用message组件代替静态notification
+              message.warning(errorMessage);
               break;
             case ErrorShowType.ERROR_MESSAGE:
-              notification.error({
-                description: errorMessage,
-                message: '错误',
-              });
+              message.error(errorMessage);
               break;
             case ErrorShowType.NOTIFICATION:
-              notification.open({
-                description: errorMessage,
-                message: errorCode,
-              });
+              message.info(`${errorCode}: ${errorMessage}`);
               break;
             case ErrorShowType.REDIRECT:
               // TODO: redirect
               break;
             default:
-              notification.error({
-                description: errorMessage,
-                message: '错误',
-              });
+              message.error(errorMessage);
           }
         }
       } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        notification.error({
-          description: `Response status:${error.response.status}`,
-          message: '网络错误',
-        });
+        message.error(`网络错误: Response status: ${error.response.status}`);
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
-        notification.error({
-          description: 'None response! Please retry.',
-          message: '网络错误',
-        });
+        message.error('网络错误: None response! Please retry.');
       } else {
         // 发送请求时出了点问题
-        notification.error({
-          description: 'Request error, please retry.',
-          message: '请求错误',
-        });
+        message.error('请求错误: Request error, please retry.');
       }
     },
   },
@@ -106,9 +85,20 @@ export const errorConfig: RequestConfig = {
   // 请求拦截器
   requestInterceptors: [
     (config: RequestOptions) => {
-      // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token=123');
-      return { ...config, url };
+      // 拦截请求配置，进行个性化处理
+      // 确保不添加任何硬编码的token参数
+      if (config.params) {
+        // 移除可能存在的token参数
+        delete config.params.token;
+      }
+
+      // 从localStorage获取token并添加到请求头
+      const token = localStorage.getItem('token');
+      if (token && config.headers) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      return config;
     },
   ],
 
@@ -118,12 +108,26 @@ export const errorConfig: RequestConfig = {
       // 拦截响应数据，进行个性化处理
       const { data } = response as unknown as ResponseStructure;
 
+      // 如果是登录接口，尝试多种方式提取token
+      if (response.config?.url === '/api/auth/login') {
+        // 打印响应数据到控制台，便于调试
+        console.log('Login response:', data);
+
+        // 检查多种可能的token位置
+        let token = null;
+        if (data?.data?.token) token = data.data.token;
+        else if (data?.token) token = data.token;
+        else if (data?.access_token) token = data.access_token;
+
+        if (token) {
+          localStorage.setItem('token', token);
+          message.success('Token 已保存');
+        }
+      }
+
       if (data?.success === false) {
-        // 使用notification代替静态message
-        notification.error({
-          description: '请求失败！',
-          message: '操作提示',
-        });
+        // 使用message组件代替静态notification
+        message.error('请求失败！');
       }
       return response;
     },

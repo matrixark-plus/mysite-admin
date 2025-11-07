@@ -3,10 +3,55 @@ import type { User, UserListParams, UserListResult } from './types';
 
 // 登录
 export async function login(data: { email: string; password: string; type?: string }) {
-  return request('/api/login', {
+  console.log('Login function called with:', data);
+  
+  // 调用后端API，根据proxy配置，请求会被代理到 http://localhost:9501/api/auth/login
+  const response = await request<{ code: number; message: string; data?: { token: string; user: any } }>('/api/auth/login', {
     method: 'POST',
-    data,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: data,
   });
+
+  console.log('Login response:', response);
+  
+  // 尝试从多个可能的位置提取token和用户信息
+  let token = null;
+  let user = null;
+  
+  if (response && typeof response === 'object') {
+    // 根据实际后端返回格式提取数据
+    if (response.code === 200 && response.data) {
+      token = response.data.token;
+      user = response.data.user;
+    } else {
+      // 兼容其他可能的格式
+      token = response.data?.token || response.token || response.access_token;
+      user = response.data?.user;
+    }
+    
+    // 日志记录token和用户信息
+    console.log('Extracted token:', token ? 'Token exists but not logged for security' : 'No token found in response');
+    console.log('Extracted user:', user ? 'User info received' : 'No user info found in response');
+    
+    // 保存token和用户信息到localStorage
+    if (token) {
+      localStorage.setItem('token', token);
+      console.log('Token saved to localStorage');
+    }
+    
+    if (user) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      console.log('User info saved to localStorage');
+    }
+  }
+  
+  // 确保返回success字段
+  return {
+    ...response,
+    success: response.code === 200 && !!token, // 以code为200且有token作为登录成功的标准
+  };
 }
 
 // 注册

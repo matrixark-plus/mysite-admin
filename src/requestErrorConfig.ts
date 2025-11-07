@@ -1,6 +1,7 @@
-﻿import type { RequestOptions } from '@@/plugin-request/request';
+import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { message, notification } from 'antd';
+import { notification } from 'antd';
+import { useRequest } from '@umijs/max';
 
 // 错误处理方案： 错误类型
 enum ErrorShowType {
@@ -51,10 +52,17 @@ export const errorConfig: RequestConfig = {
               // do nothing
               break;
             case ErrorShowType.WARN_MESSAGE:
-              message.warning(errorMessage);
+              // 使用通知代替静态message
+              notification.warning({
+                description: errorMessage,
+                message: '警告',
+              });
               break;
             case ErrorShowType.ERROR_MESSAGE:
-              message.error(errorMessage);
+              notification.error({
+                description: errorMessage,
+                message: '错误',
+              });
               break;
             case ErrorShowType.NOTIFICATION:
               notification.open({
@@ -66,21 +74,31 @@ export const errorConfig: RequestConfig = {
               // TODO: redirect
               break;
             default:
-              message.error(errorMessage);
+              notification.error({
+                description: errorMessage,
+                message: '错误',
+              });
           }
         }
       } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(`Response status:${error.response.status}`);
+        notification.error({
+          description: `Response status:${error.response.status}`,
+          message: '网络错误',
+        });
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
-        // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，
-        // 而在node.js中是 http.ClientRequest 的实例
-        message.error('None response! Please retry.');
+        notification.error({
+          description: 'None response! Please retry.',
+          message: '网络错误',
+        });
       } else {
         // 发送请求时出了点问题
-        message.error('Request error, please retry.');
+        notification.error({
+          description: 'Request error, please retry.',
+          message: '请求错误',
+        });
       }
     },
   },
@@ -101,7 +119,11 @@ export const errorConfig: RequestConfig = {
       const { data } = response as unknown as ResponseStructure;
 
       if (data?.success === false) {
-        message.error('请求失败！');
+        // 使用notification代替静态message
+        notification.error({
+          description: '请求失败！',
+          message: '操作提示',
+        });
       }
       return response;
     },

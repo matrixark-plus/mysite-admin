@@ -24,8 +24,7 @@ import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import { Footer } from '@/components';
-import { login } from '@/services/ant-design-pro/api';
-import { getFakeCaptcha } from '@/services/ant-design-pro/login';
+import { login, getFakeCaptcha } from '@/services/user';
 import Settings from '../../../../config/defaultSettings';
 
 const useStyles = createStyles(({ token }) => {
@@ -133,8 +132,8 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
+      const response = await login({ ...values, type });
+      if (response.success) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
@@ -145,9 +144,9 @@ const Login: React.FC = () => {
         window.location.href = urlParams.get('redirect') || '/';
         return;
       }
-      console.log(msg);
+      console.log(response);
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      setUserLoginState({ status: 'error', type });
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -228,29 +227,38 @@ const Login: React.FC = () => {
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
-                defaultMessage: '账户或密码错误(admin/ant.design)',
+                defaultMessage: '邮箱或密码错误',
               })}
             />
           )}
           {type === 'account' && (
             <>
               <ProFormText
-                name="username"
+                name="email"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
                 placeholder={intl.formatMessage({
-                  id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
+                  id: 'pages.login.email.placeholder',
+                  defaultMessage: '请输入邮箱地址',
                 })}
                 rules={[
                   {
                     required: true,
                     message: (
                       <FormattedMessage
-                        id="pages.login.username.required"
-                        defaultMessage="请输入用户名!"
+                        id="pages.login.email.required"
+                        defaultMessage="请输入邮箱!"
+                      />
+                    ),
+                  },
+                  {
+                    type: 'email',
+                    message: (
+                      <FormattedMessage
+                        id="pages.login.email.invalid"
+                        defaultMessage="邮箱格式不正确!"
                       />
                     ),
                   },

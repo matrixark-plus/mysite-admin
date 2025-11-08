@@ -2,7 +2,7 @@ import { request } from '@umijs/max';
 import type { User, UserListParams, UserListResult } from './types';
 
 // 登录
-export async function login(data: { email: string; password: string; type?: string }) {
+export async function login(data: { email: string; password: string }) {
   const response = await request<{ code: number; message: string; data?: { token: string; user: any } }>('/api/auth/login', {
     method: 'POST',
     headers: {

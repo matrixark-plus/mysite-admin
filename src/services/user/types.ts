@@ -43,7 +43,6 @@ export interface UserListResult {
 export interface LoginParams {
   email: string;
   password: string;
-  type?: string;
 }
 
 /**

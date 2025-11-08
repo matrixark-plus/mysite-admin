@@ -63,7 +63,6 @@ declare namespace API {
     email?: string;
     password?: string;
     autoLogin?: boolean;
-    type?: string;
   };
 
   type ErrorResponse = {

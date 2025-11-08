@@ -3,9 +3,6 @@ import type { User, UserListParams, UserListResult } from './types';
 
 // 登录
 export async function login(data: { email: string; password: string; type?: string }) {
-  console.log('Login function called with:', data);
-  
-  // 调用后端API，根据proxy配置，请求会被代理到 http://localhost:9501/api/auth/login
   const response = await request<{ code: number; message: string; data?: { token: string; user: any } }>('/api/auth/login', {
     method: 'POST',
     headers: {
@@ -13,8 +10,6 @@ export async function login(data: { email: string; password: string; type?: stri
     },
     data: data,
   });
-
-  console.log('Login response:', response);
   
   // 尝试从多个可能的位置提取token和用户信息
   let token = null;
@@ -25,25 +20,14 @@ export async function login(data: { email: string; password: string; type?: stri
     if (response.code === 200 && response.data) {
       token = response.data.token;
       user = response.data.user;
-    } else {
-      // 兼容其他可能的格式
-      token = response.data?.token || response.token || response.access_token;
-      user = response.data?.user;
     }
-    
-    // 日志记录token和用户信息
-    console.log('Extracted token:', token ? 'Token exists but not logged for security' : 'No token found in response');
-    console.log('Extracted user:', user ? 'User info received' : 'No user info found in response');
-    
     // 保存token和用户信息到localStorage
     if (token) {
       localStorage.setItem('token', token);
-      console.log('Token saved to localStorage');
     }
     
     if (user) {
       localStorage.setItem('currentUser', JSON.stringify(user));
-      console.log('User info saved to localStorage');
     }
   }
   
@@ -56,7 +40,7 @@ export async function login(data: { email: string; password: string; type?: stri
 
 // 注册
 export async function register(data: { username: string; email: string; password: string }) {
-  return request('/api/register', {
+  return request('/api/auth/register', {
     method: 'POST',
     data,
   });
@@ -64,37 +48,37 @@ export async function register(data: { username: string; email: string; password
 
 // 登出
 export async function logout() {
-  return request('/api/logout', {
-    method: 'POST',
+  return request('/api/auth/logout', {
+    method: 'DELETE',
   });
 }
 
 // 获取当前用户信息
 export async function getCurrentUser() {
-  return request('/api/user/info', {
+  return request('/api/auth/me', {
     method: 'GET',
   });
 }
 
 // 更新用户信息
 export async function updateCurrentUser(data: Partial<User>) {
-  return request('/api/user/update', {
+  return request('/api/auth/profile', {
     method: 'PUT',
     data,
   });
 }
 
 // 修改密码
-export async function changePassword(data: { oldPassword: string; newPassword: string }) {
-  return request('/api/user/change-password', {
-    method: 'POST',
+export async function changePassword(data: { current_password: string; new_password: string }) {
+  return request('/api/auth/password', {
+    method: 'PUT',
     data,
   });
 }
 
 // 刷新Token
 export async function refreshToken() {
-  return request('/api/refresh-token', {
+  return request('/api/auth/refresh', {
     method: 'POST',
   });
 }

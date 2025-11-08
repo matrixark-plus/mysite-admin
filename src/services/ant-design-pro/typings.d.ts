@@ -75,8 +75,7 @@ declare namespace API {
     message: string;
     /** 业务上的响应数据 */
     data: any;
-    /** 业务上的请求是否成功 */
-    success?: boolean;
+    
   };
 
   type NoticeIconList = {

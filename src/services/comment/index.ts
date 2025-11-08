@@ -9,11 +9,49 @@ export async function getCommentList(params: CommentListParams) {
   });
 }
 
-// 审核评论
-export async function reviewComment(id: number, status: 'approved' | 'rejected') {
-  return request(`/api/comments/${id}/review`, {
+// 获取待审核评论列表
+export async function getPendingComments(params?: CommentListParams) {
+  return request<CommentListResult>('/api/comments/pending/list', {
+    method: 'GET',
+    params,
+  });
+}
+
+// 审核通过评论
+export async function approveComment(id: number) {
+  return request(`/api/comments/${id}/approve`, {
+    method: 'PUT',
+  });
+}
+
+// 拒绝评论
+export async function rejectComment(id: number) {
+  return request(`/api/comments/${id}/reject`, {
+    method: 'PUT',
+  });
+}
+
+// 批量审核评论
+export async function batchReviewComments(ids: number[], status: 'approved' | 'rejected') {
+  return request('/api/comments/batch-review', {
     method: 'POST',
-    data: { status },
+    data: { ids, status },
+  });
+}
+
+// 获取评论的回复
+export async function getReplies(id: number, params?: CommentListParams) {
+  return request<CommentListResult>(`/api/comments/${id}/replies`, {
+    method: 'GET',
+    params,
+  });
+}
+
+// 回复评论
+export async function replyComment(id: number, data: { content: string }) {
+  return request(`/api/comments/${id}/reply`, {
+    method: 'POST',
+    data,
   });
 }
 

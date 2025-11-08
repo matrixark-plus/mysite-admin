@@ -76,25 +76,25 @@ export async function createUsersWithListInput(body: API.User[], options?: { [ke
   });
 }
 
-/** Logs user into the system GET /user/login */
+/** Logs user into the system POST /api/auth/login */
 export async function loginUser(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.loginUserParams,
   options?: { [key: string]: any },
 ) {
-  return request<string>('/user/login', {
-    method: 'GET',
-    params: {
+  return request<string>('/api/auth/login', {
+    method: 'POST',
+    data: {
       ...params,
     },
     ...(options || {}),
   });
 }
 
-/** Logs out current logged in user session GET /user/logout */
+/** Logs out current logged in user session DELETE /api/auth/logout */
 export async function logoutUser(options?: { [key: string]: any }) {
-  return request<any>('/user/logout', {
-    method: 'GET',
+  return request<any>('/api/auth/logout', {
+    method: 'DELETE',
     ...(options || {}),
   });
 }

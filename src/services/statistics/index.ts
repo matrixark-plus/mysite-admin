@@ -3,7 +3,7 @@ import type { StatisticsData, ActivityLog } from './types';
 
 // 获取系统统计数据
 export async function getSystemStatistics() {
-  return request<{ data: StatisticsData }>('/api/statistics', {
+  return request<{ data: StatisticsData }>('/api/system/statistics', {
     method: 'GET',
   });
 }

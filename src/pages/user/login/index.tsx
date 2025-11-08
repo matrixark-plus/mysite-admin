@@ -145,7 +145,7 @@ const Login: React.FC = () => {
       }
       console.log(response);
       // 如果失败去设置用户错误信息
-      setUserLoginState({ status: 'error', type });
+      setUserLoginState({ status: 'error' });
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -155,7 +155,7 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
-  const { status, type: loginType } = userLoginState;
+  const { status } = userLoginState;
 
   return (
     <div className={styles.container}>
@@ -200,7 +200,7 @@ const Login: React.FC = () => {
             await handleSubmit(values as API.LoginParams);
           }}
         >
-          {status === 'error' && loginType === 'account' && (
+          {status === 'error' && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
@@ -208,7 +208,7 @@ const Login: React.FC = () => {
               })}
             />
           )}
-            <>
+          <>
               <ProFormText
                 name="email"
                 fieldProps={{
@@ -263,7 +263,6 @@ const Login: React.FC = () => {
                 ]}
               />
             </>
-          )}
           <div
             style={{
               marginBottom: 24,

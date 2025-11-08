@@ -33,13 +33,10 @@ export default {
   'GET /api/auth/me': (_req: Request, res: Response) => {
     if (!getAccess()) {
       res.status(401).send({
-        data: {
-          isLogin: false,
-        },
-        errorCode: '401',
-        errorMessage: '请先登录！',
-        success: true,
-      });
+      code: 401,
+      message: '请先登录！',
+      data: null,
+    });
       return;
     }
     res.send({

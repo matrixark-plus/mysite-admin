@@ -70,9 +70,11 @@ declare namespace API {
 
   type ErrorResponse = {
     /** 业务约定的错误码 */
-    errorCode: string;
+    code: number;
     /** 业务上的错误信息 */
-    errorMessage?: string;
+    message: string;
+    /** 业务上的响应数据 */
+    data: any;
     /** 业务上的请求是否成功 */
     success?: boolean;
   };

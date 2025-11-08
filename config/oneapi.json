@@ -507,16 +507,21 @@
         }
       },
       "ErrorResponse": {
-        "required": ["errorCode"],
-        "type": "object",
-        "properties": {
-          "errorCode": {
-            "type": "string",
-            "description": "业务约定的错误码"
-          },
-          "errorMessage": {
-            "type": "string",
-            "description": "业务上的错误信息"
+        "required": ["code", "message"],
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer",
+              "description": "错误码（与HTTP状态码一致）"
+            },
+            "message": {
+              "type": "string",
+              "description": "错误信息"
+            },
+            "data": {
+              "type": "any",
+              "description": "响应数据"
+            }
           },
           "success": {
             "type": "boolean",

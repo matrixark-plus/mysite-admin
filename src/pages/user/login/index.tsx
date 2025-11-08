@@ -130,7 +130,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const response = await login({ ...values, type: 'account' });
+      const response = await login({ email: values.email!, password: values.password! });
       // 检查response.code === 200而不是success
       if (response && response.code === 200) {
         const defaultLoginSuccessMessage = intl.formatMessage({
